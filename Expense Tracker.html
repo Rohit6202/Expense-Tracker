@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Expense Tracker</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Container and layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Grid layout for main sections */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card component */
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Form styles */
+        .expense-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+        }
+
+        .form-input.success {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 3px rgb(16 185 129 / 0.1);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Button styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #475569;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Filter section */
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .expense-table th,
+        .expense-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .expense-table th {
+            background-color: var(--background-color);
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .expense-table th:hover {
+            background-color: #e2e8f0;
+        }
+
+        .expense-table th.sortable::after {
+            content: '↕';
+            position: absolute;
+            right: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .expense-table th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        .expense-table th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        .expense-table tbody tr:hover {
+            background-color: var(--background-color);
+        }
+
+        .amount-cell {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .running-total {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* Summary section */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+
+        .summary-card h3 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* Balance section */
+        .balance-list {
+            list-style: none;
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .balance-name {
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-weight: 600;
+        }
+
+        .balance-positive {
+            color: var(--success-color);
+        }
+
+        .balance-negative {
+            color: var(--error-color);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* QR Code container */
+        .qr-container {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .expense-table th,
+            .expense-table td {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .header,
+            .filters,
+            .action-buttons,
+            .btn {
+                display: none !important;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+
+            .expense-table {
+                font-size: 12px;
+            }
+
+            .expense-table th,
+            .expense-table td {
+                padding: 0.25rem;
+            }
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles for better accessibility */
+        .btn:focus,
+        .form-input:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>💰 Expense Tracker</h1>
+            <p>Track group expenses and calculate fair splits automatically</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Form and Summary -->
+            <div>
+                <!-- Expense Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Add New Expense</h2>
+                    </div>
+                    <form class="expense-form" id="expenseForm" novalidate>
+                        <div class="form-group">
+                            <label for="contributorName" class="form-label">Contributor Name *</label>
+                            <input 
+                                type="text" 
+                                id="contributorName" 
+                                name="contributorName" 
+                                class="form-input" 
+                                required 
+                                pattern="[A-Za-z\s]+"
+                                maxlength="50"
+                                autocomplete="name"
+                                aria-describedby="contributorNameError"
+                            >
+                            <div class="error-message" id="contributorNameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="form-label">Product/Service Description *</label>
+                            <input 
+                                type="text" 
+                                id="description" 
+                                name="description" 
+                                class="form-input" 
+                                required 
+                                maxlength="100"
+                                aria-describedby="descriptionError"
+                            >
+                            <div class="error-message" id="descriptionError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount" class="form-label">Amount ($) *</label>
+                            <input 
+                                type="number" 
+                                id="amount" 
+                                name="amount" 
+                                class="form-input" 
+                                required 
+                                min="0.01" 
+                                step="0.01"
+                                aria-describedby="amountError"
+                            >
+                            <div class="error-message" id="amountError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expenseDate" class="form-label">Date of Expense *</label>
+                            <input 
+                                type="date" 
+                                id="expenseDate" 
+                                name="expenseDate" 
+                                class="form-input" 
+                                required
+                                aria-describedby="expenseDateError"
+                            >
+                            <div class="error-message" id="expenseDateError"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span>Add Expense</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Total Expenses</h3>
+                        <div class="value" id="totalExpenses">$0.00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Per Person Share</h3>
+                        <div class="value" id="perPersonShare">$0.00</div>
+                    </div>
+                </div>
+
+                <!-- Individual Balances -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Individual Balances</h2>
+                    </div>
+                    <ul class="balance-list" id="balanceList">
+                        <li class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>No contributors yet. Add an expense to get started!</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Column: Expense List -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Expense History</h2>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters">
+                        <div class="form-group">
+                            <label for="filterContributor" class="form-label">Filter by Contributor</label>
+                            <select id="filterContributor" class="form-input">
+                                <option value="">All Contributors</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filterDateFrom" class="form-label">From Date</label>
+                            <input type="date" id="filterDateFrom" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterDateTo" class="form-label">To Date</label>
+                            <input type="date" id="filterDateTo" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterAmountMin" class="form-label">Min Amount</label>
+                            <input type="number" id="filterAmountMin" class="form-input" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterAmountMax" class="form-label">Max Amount</label>
+                            <input type="number" id="filterAmountMax" class="form-input" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-secondary" id="clearFilters">Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Expense Table -->
+                    <div class="table-container">
+                        <table class="expense-table" id="expenseTable">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="date">Date</th>
+                                    <th class="sortable" data-sort="contributor">Contributor</th>
+                                    <th class="sortable" data-sort="description">Description</th>
+                                    <th class="sortable" data-sort="amount">Amount</th>
+                                    <th>Running Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        <div class="empty-state-icon">📊</div>
+                                        <p>No expenses recorded yet. Add your first expense above!</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-success" id="exportPdfBtn">
+                📄 Export PDF
+            </button>
+            <button class="btn btn-primary" id="generateQrBtn">
+                📱 Generate QR Code
+            </button>
+            <button class="btn btn-success" id="shareWhatsappBtn">
+                💬 Share on WhatsApp
+            </button>
+            <button class="btn btn-danger" id="resetAllBtn">
+                🗑️ Reset All Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmTitle">Confirm Action</h3>
+                <p id="confirmMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
+                <button class="btn btn-danger" id="confirmOk">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Share Expense Summary</h3>
+                <p>Scan this QR code to view the expense summary</p>
+            </div>
+            <div class="qr-container" id="qrContainer">
+                <!-- QR code will be generated here -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="closeQrModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Comprehensive Expense Tracker Application
+         * Features: Real-time validation, sorting, filtering, data persistence,
+         * PDF export, QR code generation, WhatsApp sharing
+         */
+
+        class ExpenseTracker {
+            constructor() {
+                this.expenses = [];
+                this.currentSort = { field: 'date', direction: 'desc' };
+                this.filters = {
+                    contributor: '',
+                    dateFrom: '',
+                    dateTo: '',
+                    amountMin: '',
+                    amountMax: ''
+                };
+                
+                this.init();
+            }
+
+            /**
+             * Initialize the application
+             */
+            init() {
+                this.loadFromStorage();
+                this.setupEventListeners();
+                this.setupFormValidation();
+                this.updateDisplay();
+                this.setDefaultDate();
+            }
+
+            /**
+             * Set up all event listeners
+             */
+            setupEventListeners() {
+                // Form submission
+                document.getElementById('expenseForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleFormSubmit();
+                });
+
+                // Real-time validation
+                const inputs = document.querySelectorAll('.form-input');
+                inputs.forEach(input => {
+                    input.addEventListener('blur', () => this.validateField(input));
+                    input.addEventListener('input', () => this.clearFieldError(input));
+                });
+
+                // Table sorting
+                document.querySelectorAll('.sortable').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const field = header.dataset.sort;
+                        this.sortExpenses(field);
+                    });
+                });
+
+                // Filters
+                document.getElementById('filterContributor').addEventListener('change', () => this.applyFilters());
+                document.getElementById('filterDateFrom').addEventListener('change', () => this.applyFilters());
+                document.getElementById('filterDateTo').addEventListener('change', () => this.applyFilters());
+                document.getElementById('filterAmountMin').addEventListener('input', () => this.applyFilters());
+                document.getElementById('filterAmountMax').addEventListener('input', () => this.applyFilters());
+                document.getElementById('clearFilters').addEventListener('click', () => this.clearFilters());
+
+                // Action buttons
+                document.getElementById('exportPdfBtn').addEventListener('click', () => this.exportToPDF());
+                document.getElementById('generateQrBtn').addEventListener('click', () => this.generateQRCode());
+                document.getElementById('shareWhatsappBtn').addEventListener('click', () => this.shareOnWhatsApp());
+                document.getElementById('resetAllBtn').addEventListener('click', () => this.showConfirmModal());
+
+                // Modal events
+                document.getElementById('confirmCancel').addEventListener('click', () => this.hideConfirmModal());
+                document.getElementById('confirmOk').addEventListener('click', () => this.resetAllData());
+                document.getElementById('closeQrModal').addEventListener('click', () => this.hideQrModal());
+
+                // Close modals on backdrop click
+                document.getElementById('confirmModal').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) this.hideConfirmModal();
+                });
+                document.getElementById('qrModal').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) this.hideQrModal();
+                });
+            }
+
+            /**
+             * Set up form validation rules
+             */
+            setupFormValidation() {
+                const validationRules = {
+                    contributorName: {
+                        required: true,
+                        pattern: /^[A-Za-z\s]+$/,
+                        message: 'Name must contain only letters and spaces'
+                    },
+                    description: {
+                        required: true,
+                        maxLength: 100,
+                        message: 'Description is required (max 100 characters)'
+                    },
+                    amount: {
+                        required: true,
+                        min: 0.01,
+                        message: 'Amount must be greater than $0.00'
+                    },
+                    expenseDate: {
+                        required: true,
+                        maxDate: new Date().toISOString().split('T')[0],
+                        message: 'Date cannot be in the future'
+                    }
+                };
+
+                this.validationRules = validationRules;
+            }
+
+            /**
+             * Set default date to today
+             */
+            setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('expenseDate').value = today;
+            }
+
+            /**
+             * Validate individual form field
+             */
+            validateField(field) {
+                const rule = this.validationRules[field.name];
+                if (!rule) return true;
+
+                const value = field.value.trim();
+                let isValid = true;
+                let message = '';
+
+                // Required validation
+                if (rule.required && !value) {
+                    isValid = false;
+                    message = `${field.labels[0].textContent.replace(' *', '')} is required`;
+                }
+
+                // Pattern validation
+                if (isValid && rule.pattern && value && !rule.pattern.test(value)) {
+                    isValid = false;
+                    message = rule.message;
+                }
+
+                // Length validation
+                if (isValid && rule.maxLength && value.length > rule.maxLength) {
+                    isValid = false;
+                    message = rule.message;
+                }
+
+                // Number validation
+                if (isValid && rule.min && parseFloat(value) < rule.min) {
+                    isValid = false;
+                    message = rule.message;
+                }
+
+                // Date validation
+                if (isValid && rule.maxDate && value > rule.maxDate) {
+                    isValid = false;
+                    message = rule.message;
+                }
+
+                this.showFieldValidation(field, isValid, message);
+                return isValid;
+            }
+
+            /**
+             * Show field validation state
+             */
+            showFieldValidation(field, isValid, message) {
+                const errorElement = document.getElementById(field.name + 'Error');
+                
+                field.classList.remove('error', 'success');
+                errorElement.classList.remove('show');
+
+                if (!isValid) {
+                    field.classList.add('error');
+                    errorElement.textContent = message;
+                    errorElement.classList.add('show');
+                } else if (field.value.trim()) {
+                    field.classList.add('success');
+                }
+            }
+
+            /**
+             * Clear field error state
+             */
+            clearFieldError(field) {
+                field.classList.remove('error');
+                const errorElement = document.getElementById(field.name + 'Error');
+                errorElement.classList.remove('show');
+            }
+
+            /**
+             * Validate entire form
+             */
+            validateForm() {
+                const form = document.getElementById('expenseForm');
+                const inputs = form.querySelectorAll('.form-input');
+                let isValid = true;
+
+                inputs.forEach(input => {
+                    if (!this.validateField(input)) {
+                        isValid = false;
+                    }
+                });
+
+                return isValid;
+            }
+
+            /**
+             * Handle form submission
+             */
+            async handleFormSubmit() {
+                if (!this.validateForm()) {
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitBtn');
+                this.setButtonLoading(submitBtn, true);
+
+                try {
+                    // Simulate async operation
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    const formData = new FormData(document.getElementById('expenseForm'));
+                    const expense = {
+                        id: Date.now(),
+                        contributor: formData.get('contributorName').trim(),
+                        description: formData.get('description').trim(),
+                        amount: parseFloat(formData.get('amount')),
+                        date: formData.get('expenseDate'),
+                        timestamp: new Date().toISOString()
+                    };
+
+                    this.addExpense(expense);
+                    this.resetForm();
+                    this.showSuccessMessage('Expense added successfully!');
+
+                } catch (error) {
+                    this.showErrorMessage('Failed to add expense. Please try again.');
+                } finally {
+                    this.setButtonLoading(submitBtn, false);
+                }
+            }
+
+            /**
+             * Add new expense
+             */
+            addExpense(expense) {
+                this.expenses.push(expense);
+                this.saveToStorage();
+                this.updateDisplay();
+            }
+
+            /**
+             * Delete expense
+             */
+            deleteExpense(id) {
+                this.expenses = this.expenses.filter(expense => expense.id !== id);
+                this.saveToStorage();
+                this.updateDisplay();
+            }
+
+            /**
+             * Reset form
+             */
+            resetForm() {
+                const form = document.getElementById('expenseForm');
+                form.reset();
+                this.setDefaultDate();
+                
+                // Clear validation states
+                form.querySelectorAll('.form-input').forEach(input => {
+                    input.classList.remove('error', 'success');
+                });
+                form.querySelectorAll('.error-message').forEach(error => {
+                    error.classList.remove('show');
+                });
+            }
+
+            /**
+             * Sort expenses
+             */
+            sortExpenses(field) {
+                if (this.currentSort.field === field) {
+                    this.currentSort.direction = this.currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.currentSort.field = field;
+                    this.currentSort.direction = 'asc';
+                }
+
+                this.expenses.sort((a, b) => {
+                    let aVal = a[field];
+                    let bVal = b[field];
+
+                    if (field === 'amount') {
+                        aVal = parseFloat(aVal);
+                        bVal = parseFloat(bVal);
+                    }
+
+                    if (field === 'date') {
+                        aVal = new Date(aVal);
+                        bVal = new Date(bVal);
+                    }
+
+                    if (aVal < bVal) return this.currentSort.direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return this.currentSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                this.updateTableDisplay();
+                this.updateSortHeaders();
+            }
+
+            /**
+             * Update sort header indicators
+             */
+            updateSortHeaders() {
+                document.querySelectorAll('.sortable').forEach(header => {
+                    header.classList.remove('sort-asc', 'sort-desc');
+                    if (header.dataset.sort === this.currentSort.field) {
+                        header.classList.add(`sort-${this.currentSort.direction}`);
+                    }
+                });
+            }
+
+            /**
+             * Apply filters
+             */
+            applyFilters() {
+                this.filters = {
+                    contributor: document.getElementById('filterContributor').value,
+                    dateFrom: document.getElementById('filterDateFrom').value,
+                    dateTo: document.getElementById('filterDateTo').value,
+                    amountMin: document.getElementById('filterAmountMin').value,
+                    amountMax: document.getElementById('filterAmountMax').value
+                };
+
+                this.updateTableDisplay();
+            }
+
+            /**
+             * Clear all filters
+             */
+            clearFilters() {
+                document.getElementById('filterContributor').value = '';
+                document.getElementById('filterDateFrom').value = '';
+                document.getElementById('filterDateTo').value = '';
+                document.getElementById('filterAmountMin').value = '';
+                document.getElementById('filterAmountMax').value = '';
+                
+                this.filters = {
+                    contributor: '',
+                    dateFrom: '',
+                    dateTo: '',
+                    amountMin: '',
+                    amountMax: ''
+                };
+
+                this.updateTableDisplay();
+            }
+
+            /**
+             * Get filtered expenses
+             */
+            getFilteredExpenses() {
+                return this.expenses.filter(expense => {
+                    // Contributor filter
+                    if (this.filters.contributor && expense.contributor !== this.filters.contributor) {
+                        return false;
+                    }
+
+                    // Date range filter
+                    if (this.filters.dateFrom && expense.date < this.filters.dateFrom) {
+                        return false;
+                    }
+                    if (this.filters.dateTo && expense.date > this.filters.dateTo) {
+                        return false;
+                    }
+
+                    // Amount range filter
+                    if (this.filters.amountMin && expense.amount < parseFloat(this.filters.amountMin)) {
+                        return false;
+                    }
+                    if (this.filters.amountMax && expense.amount > parseFloat(this.filters.amountMax)) {
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            /**
+             * Update all displays
+             */
+            updateDisplay() {
+                this.updateTableDisplay();
+                this.updateSummaryDisplay();
+                this.updateBalanceDisplay();
+                this.updateContributorFilter();
+            }
+
+            /**
+             * Update table display
+             */
+            updateTableDisplay() {
+                const tbody = document.getElementById('expenseTableBody');
+                const filteredExpenses = this.getFilteredExpenses();
+
+                if (filteredExpenses.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <p>No expenses match your current filters.</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                let runningTotal = 0;
+                tbody.innerHTML = filteredExpenses.map(expense => {
+                    runningTotal += expense.amount;
+                    return `
+                        <tr>
+                            <td>${this.formatDate(expense.date)}</td>
+                            <td>${this.escapeHtml(expense.contributor)}</td>
+                            <td>${this.escapeHtml(expense.description)}</td>
+                            <td class="amount-cell">${this.formatCurrency(expense.amount)}</td>
+                            <td class="running-total">${this.formatCurrency(runningTotal)}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="expenseTracker.deleteExpense(${expense.id})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            /**
+             * Update summary display
+             */
+            updateSummaryDisplay() {
+                const total = this.getTotalExpenses();
+                const contributors = this.getUniqueContributors();
+                const perPersonShare = contributors.length > 0 ? total / contributors.length : 0;
+
+                document.getElementById('totalExpenses').textContent = this.formatCurrency(total);
+                document.getElementById('perPersonShare').textContent = this.formatCurrency(perPersonShare);
+            }
+
+            /**
+             * Update balance display
+             */
+            updateBalanceDisplay() {
+                const balanceList = document.getElementById('balanceList');
+                const balances = this.calculateBalances();
+
+                if (Object.keys(balances).length === 0) {
+                    balanceList.innerHTML = `
+                        <li class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>No contributors yet. Add an expense to get started!</p>
+                        </li>
+                    `;
+                    return;
+                }
+
+                balanceList.innerHTML = Object.entries(balances).map(([contributor, balance]) => {
+                    const balanceClass = balance >= 0 ? 'balance-positive' : 'balance-negative';
+                    const balanceText = balance >= 0 ? `Owed ${this.formatCurrency(Math.abs(balance))}` : `Owes ${this.formatCurrency(Math.abs(balance))}`;
+                    
+                    return `
+                        <li class="balance-item">
+                            <span class="balance-name">${this.escapeHtml(contributor)}</span>
+                            <span class="balance-amount ${balanceClass}">${balanceText}</span>
+                        </li>
+                    `;
+                }).join('');
+            }
+
+            /**
+             * Update contributor filter dropdown
+             */
+            updateContributorFilter() {
+                const select = document.getElementById('filterContributor');
+                const contributors = this.getUniqueContributors();
+                const currentValue = select.value;
+
+                select.innerHTML = '<option value="">All Contributors</option>' +
+                    contributors.map(contributor => 
+                        `<option value="${this.escapeHtml(contributor)}">${this.escapeHtml(contributor)}</option>`
+                    ).join('');
+
+                if (contributors.includes(currentValue)) {
+                    select.value = currentValue;
+                }
+            }
+
+            /**
+             * Calculate individual balances
+             */
+            calculateBalances() {
+                const contributors = this.getUniqueContributors();
+                if (contributors.length === 0) return {};
+
+                const total = this.getTotalExpenses();
+                const perPersonShare = total / contributors.length;
+                const balances = {};
+
+                contributors.forEach(contributor => {
+                    const paid = this.expenses
+                        .filter(expense => expense.contributor === contributor)
+                        .reduce((sum, expense) => sum + expense.amount, 0);
+                    
+                    balances[contributor] = paid - perPersonShare;
+                });
+
+                return balances;
+            }
+
+            /**
+             * Get total expenses
+             */
+            getTotalExpenses() {
+                return this.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            }
+
+            /**
+             * Get unique contributors
+             */
+            getUniqueContributors() {
+                return [...new Set(this.expenses.map(expense => expense.contributor))];
+            }
+
+            /**
+             * Export to PDF
+             */
+            async exportToPDF() {
+                const btn = document.getElementById('exportPdfBtn');
+                this.setButtonLoading(btn, true);
+
+                try {
+                    // Create PDF content
+                    const content = this.generatePDFContent();
+                    
+                    // Create a new window for printing
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(content);
+                    printWindow.document.close();
+                    
+                    // Trigger print dialog
+                    printWindow.focus();
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                    }, 250);
+
+                    this.showSuccessMessage('PDF export initiated. Check your browser\'s print dialog.');
+
+                } catch (error) {
+                    this.showErrorMessage('Failed to export PDF. Please try again.');
+                } finally {
+                    this.setButtonLoading(btn, false);
+                }
+            }
+
+            /**
+             * Generate PDF content
+             */
+            generatePDFContent() {
+                const total = this.getTotalExpenses();
+                const balances = this.calculateBalances();
+                const contributors = this.getUniqueContributors();
+                const perPersonShare = contributors.length > 0 ? total / contributors.length : 0;
+
+                return `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Expense Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .header { text-align: center; margin-bottom: 30px; }
+                            .summary { margin-bottom: 30px; }
+                            .summary-item { margin: 10px 0; }
+                            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #f2f2f2; }
+                            .amount { text-align: right; }
+                            .balance-positive { color: green; }
+                            .balance-negative { color: red; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>Expense Report</h1>
+                            <p>Generated on ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        
+                        <div class="summary">
+                            <h2>Summary</h2>
+                            <div class="summary-item"><strong>Total Expenses:</strong> ${this.formatCurrency(total)}</div>
+                            <div class="summary-item"><strong>Number of Contributors:</strong> ${contributors.length}</div>
+                            <div class="summary-item"><strong>Per Person Share:</strong> ${this.formatCurrency(perPersonShare)}</div>
+                        </div>
+
+                        <h2>Expense Details</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Contributor</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${this.expenses.map(expense => `
+                                    <tr>
+                                        <td>${this.formatDate(expense.date)}</td>
+                                        <td>${this.escapeHtml(expense.contributor)}</td>
+                                        <td>${this.escapeHtml(expense.description)}</td>
+                                        <td class="amount">${this.formatCurrency(expense.amount)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+
+                        <h2>Individual Balances</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Contributor</th>
+                                    <th>Amount Paid</th>
+                                    <th>Fair Share</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.entries(balances).map(([contributor, balance]) => {
+                                    const paid = this.expenses
+                                        .filter(expense => expense.contributor === contributor)
+                                        .reduce((sum, expense) => sum + expense.amount, 0);
+                                    const balanceClass = balance >= 0 ? 'balance-positive' : 'balance-negative';
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${this.escapeHtml(contributor)}</td>
+                                            <td class="amount">${this.formatCurrency(paid)}</td>
+                                            <td class="amount">${this.formatCurrency(perPersonShare)}</td>
+                                            <td class="amount ${balanceClass}">${this.formatCurrency(balance)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                    </html>
+                `;
+            }
+
+            /**
+             * Generate QR Code
+             */
+            async generateQRCode() {
+                const btn = document.getElementById('generateQrBtn');
+                this.setButtonLoading(btn, true);
+
+                try {
+                    const summary = this.generateSummaryText();
+                    const qrData = encodeURIComponent(summary);
+                    
+                    // Use a QR code API service
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrData}`;
+                    
+                    const qrContainer = document.getElementById('qrContainer');
+                    qrContainer.innerHTML = `
+                        <img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto;">
+                        <p style="margin-top: 1rem; font-size: 0.875rem; color: #666;">
+                            Scan to view expense summary
+                        </p>
+                    `;
+
+                    this.showQrModal();
+
+                } catch (error) {
+                    this.showErrorMessage('Failed to generate QR code. Please try again.');
+                } finally {
+                    this.setButtonLoading(btn, false);
+                }
+            }
+
+            /**
+             * Share on WhatsApp
+             */
+            shareOnWhatsApp() {
+                const summary = this.generateSummaryText();
+                const encodedText = encodeURIComponent(summary);
+                const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+                
+                window.open(whatsappUrl, '_blank');
+            }
+
+            /**
+             * Generate summary text for sharing
+             */
+            generateSummaryText() {
+                const total = this.getTotalExpenses();
+                const contributors = this.getUniqueContributors();
+                const perPersonShare = contributors.length > 0 ? total / contributors.length : 0;
+                const balances = this.calculateBalances();
+
+                let summary = `💰 EXPENSE SUMMARY\n`;
+                summary += `📅 Generated: ${new Date().toLocaleDateString()}\n\n`;
+                summary += `📊 TOTALS:\n`;
+                summary += `• Total Expenses: ${this.formatCurrency(total)}\n`;
+                summary += `• Contributors: ${contributors.length}\n`;
+                summary += `• Per Person Share: ${this.formatCurrency(perPersonShare)}\n\n`;
+
+                if (this.expenses.length > 0) {
+                    summary += `📋 EXPENSES:\n`;
+                    this.expenses.forEach(expense => {
+                        summary += `• ${expense.contributor}: ${this.formatCurrency(expense.amount)} (${expense.description})\n`;
+                    });
+                    summary += `\n`;
+                }
+
+                if (Object.keys(balances).length > 0) {
+                    summary += `💳 BALANCES:\n`;
+                    Object.entries(balances).forEach(([contributor, balance]) => {
+                        if (balance >= 0) {
+                            summary += `• ${contributor}: Owed ${this.formatCurrency(Math.abs(balance))}\n`;
+                        } else {
+                            summary += `• ${contributor}: Owes ${this.formatCurrency(Math.abs(balance))}\n`;
+                        }
+                    });
+                }
+
+                return summary;
+            }
+
+            /**
+             * Show confirmation modal
+             */
+            showConfirmModal() {
+                document.getElementById('confirmTitle').textContent = 'Reset All Data';
+                document.getElementById('confirmMessage').textContent = 'Are you sure you want to delete all expenses? This action cannot be undone.';
+                document.getElementById('confirmModal').classList.add('show');
+            }
+
+            /**
+             * Hide confirmation modal
+             */
+            hideConfirmModal() {
+                document.getElementById('confirmModal').classList.remove('show');
+            }
+
+            /**
+             * Show QR modal
+             */
+            showQrModal() {
+                document.getElementById('qrModal').classList.add('show');
+            }
+
+            /**
+             * Hide QR modal
+             */
+            hideQrModal() {
+                document.getElementById('qrModal').classList.remove('show');
+            }
+
+            /**
+             * Reset all data
+             */
+            resetAllData() {
+                this.expenses = [];
+                this.saveToStorage();
+                this.updateDisplay();
+                this.resetForm();
+                this.clearFilters();
+                this.hideConfirmModal();
+                this.showSuccessMessage('All data has been reset successfully.');
+            }
+
+            /**
+             * Save data to localStorage
+             */
+            saveToStorage() {
+                try {
+                    localStorage.setItem('expenseTracker', JSON.stringify({
+                        expenses: this.expenses,
+                        lastUpdated: new Date().toISOString()
+                    }));
+                } catch (error) {
+                    this.showErrorMessage('Failed to save data. Storage may be full.');
+                }
+            }
+
+            /**
+             * Load data from localStorage
+             */
+            loadFromStorage() {
+                try {
+                    const data = localStorage.getItem('expenseTracker');
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        this.expenses = parsed.expenses || [];
+                    }
+                } catch (error) {
+                    this.showErrorMessage('Failed to load saved data.');
+                    this.expenses = [];
+                }
+            }
+
+            /**
+             * Utility: Format currency
+             */
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(amount);
+            }
+
+            /**
+             * Utility: Format date
+             */
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            /**
+             * Utility: Escape HTML
+             */
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            /**
+             * Utility: Set button loading state
+             */
+            setButtonLoading(button, isLoading) {
+                if (isLoading) {
+                    button.disabled = true;
+                    button.classList.add('btn-loading');
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('btn-loading');
+                }
+            }
+
+            /**
+             * Utility: Show success message
+             */
+            showSuccessMessage(message) {
+                this.showToast(message, 'success');
+            }
+
+            /**
+             * Utility: Show error message
+             */
+            showErrorMessage(message) {
+                this.showToast(message, 'error');
+            }
+
+            /**
+             * Utility: Show toast notification
+             */
+            showToast(message, type = 'info') {
+                // Create toast element
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 500;
+                    z-index: 10000;
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                    max-width: 400px;
+                    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+                `;
+
+                // Set background color based on type
+                const colors = {
+                    success: '#10b981',
+                    error: '#ef4444',
+                    info: '#3b82f6'
+                };
+                toast.style.backgroundColor = colors[type] || colors.info;
+                toast.textContent = message;
+
+                document.body.appendChild(toast);
+
+                // Animate in
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Remove after delay
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize the application
+        const expenseTracker = new ExpenseTracker();
+
+        // Service Worker for offline functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+                    const CACHE_NAME = 'expense-tracker-v1';
+                    const urlsToCache = ['/'];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => {
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request);
+                                })
+                        );
+                    });
+                `))
+                .then(registration => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

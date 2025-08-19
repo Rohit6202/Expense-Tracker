@@ -278,19 +278,19 @@
         }
 
         .expense-table th.sortable::after {
-            content: '↕';
+            content: 'â†•';
             position: absolute;
             right: 0.5rem;
             opacity: 0.5;
         }
 
         .expense-table th.sort-asc::after {
-            content: '↑';
+            content: 'â†‘';
             opacity: 1;
         }
 
         .expense-table th.sort-desc::after {
-            content: '↓';
+            content: 'â†“';
             opacity: 1;
         }
 
@@ -430,6 +430,12 @@
             text-align: center;
             margin: 1rem 0;
         }
+         .qr-container a {
+            display: inline-block;
+            margin-top: 1rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
 
         /* Empty state */
         .empty-state {
@@ -557,23 +563,18 @@
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
 
     <div class="container">
-        <!-- Header -->
         <header class="header">
-            <h1>💰 Expense Tracker</h1>
+            <h1>ðŸ’° Expense Tracker</h1>
             <p>Track group expenses and calculate fair splits automatically</p>
         </header>
 
-        <!-- Main Content Grid -->
         <div class="main-grid">
-            <!-- Left Column: Form and Summary -->
             <div>
-                <!-- Expense Form -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Add New Expense</h2>
@@ -610,7 +611,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="amount" class="form-label">Amount ($) *</label>
+                            <label for="amount" class="form-label">Amount (â‚¹) *</label>
                             <input 
                                 type="number" 
                                 id="amount" 
@@ -643,40 +644,36 @@
                     </form>
                 </div>
 
-                <!-- Summary Cards -->
                 <div class="summary-grid">
                     <div class="summary-card">
                         <h3>Total Expenses</h3>
-                        <div class="value" id="totalExpenses">$0.00</div>
+                        <div class="value" id="totalExpenses">â‚¹0.00</div>
                     </div>
                     <div class="summary-card">
                         <h3>Per Person Share</h3>
-                        <div class="value" id="perPersonShare">$0.00</div>
+                        <div class="value" id="perPersonShare">â‚¹0.00</div>
                     </div>
                 </div>
 
-                <!-- Individual Balances -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Individual Balances</h2>
                     </div>
                     <ul class="balance-list" id="balanceList">
                         <li class="empty-state">
-                            <div class="empty-state-icon">👥</div>
+                            <div class="empty-state-icon">ðŸ‘¥</div>
                             <p>No contributors yet. Add an expense to get started!</p>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Right Column: Expense List -->
             <div>
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Expense History</h2>
                     </div>
 
-                    <!-- Filters -->
                     <div class="filters">
                         <div class="form-group">
                             <label for="filterContributor" class="form-label">Filter by Contributor</label>
@@ -706,7 +703,6 @@
                         </div>
                     </div>
 
-                    <!-- Expense Table -->
                     <div class="table-container">
                         <table class="expense-table" id="expenseTable">
                             <thead>
@@ -722,7 +718,7 @@
                             <tbody id="expenseTableBody">
                                 <tr>
                                     <td colspan="6" class="empty-state">
-                                        <div class="empty-state-icon">📊</div>
+                                        <div class="empty-state-icon">ðŸ“Š</div>
                                         <p>No expenses recorded yet. Add your first expense above!</p>
                                     </td>
                                 </tr>
@@ -733,24 +729,22 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn btn-success" id="exportPdfBtn">
-                📄 Export PDF
+                ðŸ“„ Print / Save as PDF
             </button>
             <button class="btn btn-primary" id="generateQrBtn">
-                📱 Generate QR Code
+                ðŸ“± Generate QR Code
             </button>
             <button class="btn btn-success" id="shareWhatsappBtn">
-                💬 Share on WhatsApp
+                ðŸ’¬ Share on WhatsApp
             </button>
             <button class="btn btn-danger" id="resetAllBtn">
-                🗑️ Reset All Data
+                ðŸ—‘ï¸ Reset All Data
             </button>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div class="modal" id="confirmModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -764,7 +758,6 @@
         </div>
     </div>
 
-    <!-- QR Code Modal -->
     <div class="modal" id="qrModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -772,8 +765,7 @@
                 <p>Scan this QR code to view the expense summary</p>
             </div>
             <div class="qr-container" id="qrContainer">
-                <!-- QR code will be generated here -->
-            </div>
+                </div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" id="closeQrModal">Close</button>
             </div>
@@ -884,7 +876,7 @@
                     amount: {
                         required: true,
                         min: 0.01,
-                        message: 'Amount must be greater than $0.00'
+                        message: 'Amount must be greater than â‚¹0.00'
                     },
                     expenseDate: {
                         required: true,
@@ -1197,7 +1189,7 @@
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="6" class="empty-state">
-                                <div class="empty-state-icon">📊</div>
+                                <div class="empty-state-icon">ðŸ“Š</div>
                                 <p>No expenses match your current filters.</p>
                             </td>
                         </tr>
@@ -1247,7 +1239,7 @@
                 if (Object.keys(balances).length === 0) {
                     balanceList.innerHTML = `
                         <li class="empty-state">
-                            <div class="empty-state-icon">👥</div>
+                            <div class="empty-state-icon">ðŸ‘¥</div>
                             <p>No contributors yet. Add an expense to get started!</p>
                         </li>
                     `;
@@ -1322,39 +1314,35 @@
             }
 
             /**
-             * Export to PDF
+             * Export to PDF by opening the print dialog
              */
             async exportToPDF() {
                 const btn = document.getElementById('exportPdfBtn');
                 this.setButtonLoading(btn, true);
 
                 try {
-                    // Create PDF content
                     const content = this.generatePDFContent();
-                    
-                    // Create a new window for printing
                     const printWindow = window.open('', '_blank');
                     printWindow.document.write(content);
                     printWindow.document.close();
                     
-                    // Trigger print dialog
                     printWindow.focus();
                     setTimeout(() => {
                         printWindow.print();
                         printWindow.close();
                     }, 250);
 
-                    this.showSuccessMessage('PDF export initiated. Check your browser\'s print dialog.');
+                    this.showSuccessMessage("Print dialog opened. Select 'Save as PDF' to download.");
 
                 } catch (error) {
-                    this.showErrorMessage('Failed to export PDF. Please try again.');
+                    this.showErrorMessage('Failed to generate PDF. Please try again.');
                 } finally {
                     this.setButtonLoading(btn, false);
                 }
             }
 
             /**
-             * Generate PDF content
+             * Generate HTML content for the PDF
              */
             generatePDFContent() {
                 const total = this.getTotalExpenses();
@@ -1383,7 +1371,7 @@
                     <body>
                         <div class="header">
                             <h1>Expense Report</h1>
-                            <p>Generated on ${new Date().toLocaleDateString()}</p>
+                            <p>Generated on ${new Date().toLocaleDateString('en-IN')}</p>
                         </div>
                         
                         <div class="summary">
@@ -1456,18 +1444,21 @@
                 this.setButtonLoading(btn, true);
 
                 try {
+                    if (this.expenses.length === 0) {
+                        this.showErrorMessage('Add at least one expense to generate a QR code.');
+                        return;
+                    }
+
                     const summary = this.generateSummaryText();
                     const qrData = encodeURIComponent(summary);
                     
-                    // Use a QR code API service
+                    // Uses an external API to generate the QR code image.
                     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrData}`;
                     
                     const qrContainer = document.getElementById('qrContainer');
                     qrContainer.innerHTML = `
                         <img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto;">
-                        <p style="margin-top: 1rem; font-size: 0.875rem; color: #666;">
-                            Scan to view expense summary
-                        </p>
+                        <a href="${qrCodeUrl}" download="expense-summary-qr.png">Download QR</a>
                     `;
 
                     this.showQrModal();
@@ -1483,6 +1474,10 @@
              * Share on WhatsApp
              */
             shareOnWhatsApp() {
+                if (this.expenses.length === 0) {
+                    this.showErrorMessage('Add at least one expense to share on WhatsApp.');
+                    return;
+                }
                 const summary = this.generateSummaryText();
                 const encodedText = encodeURIComponent(summary);
                 const whatsappUrl = `https://wa.me/?text=${encodedText}`;
@@ -1499,28 +1494,28 @@
                 const perPersonShare = contributors.length > 0 ? total / contributors.length : 0;
                 const balances = this.calculateBalances();
 
-                let summary = `💰 EXPENSE SUMMARY\n`;
-                summary += `📅 Generated: ${new Date().toLocaleDateString()}\n\n`;
-                summary += `📊 TOTALS:\n`;
-                summary += `• Total Expenses: ${this.formatCurrency(total)}\n`;
-                summary += `• Contributors: ${contributors.length}\n`;
-                summary += `• Per Person Share: ${this.formatCurrency(perPersonShare)}\n\n`;
+                let summary = `ðŸ’° EXPENSE SUMMARY\n`;
+                summary += `ðŸ“… Generated: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+                summary += `ðŸ“Š TOTALS:\n`;
+                summary += `â€¢ Total Expenses: ${this.formatCurrency(total)}\n`;
+                summary += `â€¢ Contributors: ${contributors.length}\n`;
+                summary += `â€¢ Per Person Share: ${this.formatCurrency(perPersonShare)}\n\n`;
 
                 if (this.expenses.length > 0) {
-                    summary += `📋 EXPENSES:\n`;
+                    summary += `ðŸ“‹ EXPENSES:\n`;
                     this.expenses.forEach(expense => {
-                        summary += `• ${expense.contributor}: ${this.formatCurrency(expense.amount)} (${expense.description})\n`;
+                        summary += `â€¢ ${expense.contributor}: ${this.formatCurrency(expense.amount)} (${expense.description})\n`;
                     });
                     summary += `\n`;
                 }
 
                 if (Object.keys(balances).length > 0) {
-                    summary += `💳 BALANCES:\n`;
+                    summary += `ðŸ’³ BALANCES:\n`;
                     Object.entries(balances).forEach(([contributor, balance]) => {
                         if (balance >= 0) {
-                            summary += `• ${contributor}: Owed ${this.formatCurrency(Math.abs(balance))}\n`;
+                            summary += `â€¢ ${contributor}: Owed ${this.formatCurrency(Math.abs(balance))}\n`;
                         } else {
-                            summary += `• ${contributor}: Owes ${this.formatCurrency(Math.abs(balance))}\n`;
+                            summary += `â€¢ ${contributor}: Owes ${this.formatCurrency(Math.abs(balance))}\n`;
                         }
                     });
                 }
@@ -1602,12 +1597,12 @@
             }
 
             /**
-             * Utility: Format currency
+             * Utility: Format currency to INR
              */
             formatCurrency(amount) {
-                return new Intl.NumberFormat('en-US', {
+                return new Intl.NumberFormat('en-IN', {
                     style: 'currency',
-                    currency: 'USD',
+                    currency: 'INR',
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }).format(amount);
@@ -1617,7 +1612,7 @@
              * Utility: Format date
              */
             formatDate(dateString) {
-                return new Date(dateString).toLocaleDateString('en-US', {
+                return new Date(dateString).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
@@ -1675,7 +1670,7 @@
                     color: white;
                     font-weight: 500;
                     z-index: 10000;
-                    transform: translateX(100%);
+                    transform: translateX(120%);
                     transition: transform 0.3s ease;
                     max-width: 400px;
                     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
@@ -1699,9 +1694,11 @@
 
                 // Remove after delay
                 setTimeout(() => {
-                    toast.style.transform = 'translateX(100%)';
+                    toast.style.transform = 'translateX(120%)';
                     setTimeout(() => {
-                        document.body.removeChild(toast);
+                        if(document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
                     }, 300);
                 }, 3000);
             }
